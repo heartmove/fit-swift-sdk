@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.0
 
 import PackageDescription
 
@@ -28,7 +28,8 @@ let package = Package(
         ),
         .testTarget(
             name: "FITSwiftSDKTests",
-            dependencies: ["FITSwiftSDK"]),
-    ]
+            dependencies: ["FITSwiftSDK"]
+        ),
+    ],
+    swiftLanguageModes: [.v5, .v6]
 )
-

@@ -189,10 +189,10 @@ final class MesgTests: XCTestCase {
     
     func test_equatable_whenFieldNumsAreDifferent_returnsFalse() throws {
         let mesg = Factory.createDefaultMesg(mesgName: "Mesg", mesgNum: 0)
-        try mesg.fields[0] = createTestFieldWithSingleValue(type: .UINT8, value: 100)
+        try mesg.fields[0] = createTestFieldWithValue(type: .UINT8, value: 100)
         
         let mesgDifferentFieldNum = Factory.createDefaultMesg(mesgName: "Mesg", mesgNum: 0)
-        try mesg.fields[1] = createTestFieldWithSingleValue(type: .UINT8, value: 100)
+        try mesg.fields[1] = createTestFieldWithValue(type: .UINT8, value: 100)
                                                           
         XCTAssertFalse(mesg == mesgDifferentFieldNum)
     }

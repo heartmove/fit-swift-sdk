@@ -7,12 +7,14 @@
 
 
 import Foundation
-
-import XCTest
+import Testing
 @testable import FITSwiftSDK
 
-final class DeveloperDataLookupTests: XCTestCase {
+@Suite
+struct DeveloperDataLookupTests {
+    var developerDataLookup = DeveloperDataLookup()
 
+    @Test
     func test_developerDataKeyEquatable_whenBothAreIdentical_returnsEqualTrue() throws {
         let developerDataIdMesg = DeveloperDataIdMesg()
         try developerDataIdMesg.setDeveloperDataIndex(0)
@@ -24,10 +26,11 @@ final class DeveloperDataLookupTests: XCTestCase {
         
         let devDataKeyIdentical = DeveloperDataKey(developerDataIdMesg: developerDataIdMesg, fieldDescriptionMesg: fieldDescriptionMesg)
         
-        XCTAssertEqual(devDataKey, devDataKeyIdentical)
-        XCTAssertEqual(devDataKey?.hashValue, devDataKeyIdentical?.hashValue)
+        #expect(devDataKey == devDataKeyIdentical)
+        #expect(devDataKey?.hashValue == devDataKeyIdentical?.hashValue)
     }
     
+    @Test
     func test_developerDataKeyEquatable_whenBothAreDifferent_returnsEqualFalse() throws {
         let developerDataIdMesg = DeveloperDataIdMesg()
         try developerDataIdMesg.setDeveloperDataIndex(0)
@@ -45,10 +48,11 @@ final class DeveloperDataLookupTests: XCTestCase {
         
         let devDataKeyDifferent = DeveloperDataKey(developerDataIdMesg: developerDataIdMesgOther, fieldDescriptionMesg: fieldDescriptionMesgOther)
         
-        XCTAssertNotEqual(devDataKey, devDataKeyDifferent)
-        XCTAssertNotEqual(devDataKey?.hashValue, devDataKeyDifferent?.hashValue)
+        #expect(devDataKey != devDataKeyDifferent)
+        #expect(devDataKey?.hashValue != devDataKeyDifferent?.hashValue)
     }
-    
+
+    @Test
     func test_developerDataKeyEquatable_whenKeyValuePairsEqualButSwapped_returnsEqualFalse() throws {
         let developerDataIdMesg0 = DeveloperDataIdMesg()
         try developerDataIdMesg0.setDeveloperDataIndex(0)
@@ -66,10 +70,11 @@ final class DeveloperDataLookupTests: XCTestCase {
         
         let devDataKey10 = DeveloperDataKey(developerDataIdMesg: developerDataIdMesg1, fieldDescriptionMesg: fieldDescriptionMesg0)
         
-        XCTAssertNotEqual(devDataKey01, devDataKey10)
-        XCTAssertNotEqual(devDataKey01?.hashValue, devDataKey10?.hashValue)
+        #expect(devDataKey01 != devDataKey10)
+        #expect(devDataKey01?.hashValue != devDataKey10?.hashValue)
     }
-    
+
+    @Test
     func test_getDeveloperFieldDefinition_returnsEpxectedDeveloperFieldDefinition() throws {
         let developerDataIdMesg = DeveloperDataIdMesg()
         try developerDataIdMesg.setDeveloperDataIndex(0)
@@ -78,14 +83,15 @@ final class DeveloperDataLookupTests: XCTestCase {
         try fieldDescMesg.setDeveloperDataIndex(0)
         try fieldDescMesg.setFieldDefinitionNumber(0)
 
-        DeveloperDataLookup.shared.addDeveloperDataIdMesg(mesg: developerDataIdMesg)
-        DeveloperDataLookup.shared.addFieldDescriptionMesg(mesg: fieldDescMesg)
+        developerDataLookup.addDeveloperDataIdMesg(mesg: developerDataIdMesg)
+        developerDataLookup.addFieldDescriptionMesg(mesg: fieldDescMesg)
         
-        let retrieved = DeveloperDataLookup.shared.getDeveloperFieldDefinition(developerDataIdMesg: developerDataIdMesg, fieldDescriptionMesg: fieldDescMesg)
-        XCTAssertEqual(retrieved?.developerDataIdMesg?.getDeveloperDataIndex(), developerDataIdMesg.getDeveloperDataIndex())
-        XCTAssertEqual(retrieved?.fieldDescriptionMesg?.getFieldDefinitionNumber(), fieldDescMesg.getFieldDefinitionNumber())
+        let retrieved = developerDataLookup.getDeveloperFieldDefinition(developerDataIdMesg: developerDataIdMesg, fieldDescriptionMesg: fieldDescMesg)
+        #expect(retrieved?.developerDataIdMesg?.getDeveloperDataIndex() == developerDataIdMesg.getDeveloperDataIndex())
+        #expect(retrieved?.fieldDescriptionMesg?.getFieldDefinitionNumber() == fieldDescMesg.getFieldDefinitionNumber())
     }
-    
+
+    @Test
     func test_getDeveloperFieldDefintion_WhenEitherMesgWasUnadded_returnsNil() throws {
         let developerDataIdMesg = DeveloperDataIdMesg()
         try developerDataIdMesg.setDeveloperDataIndex(0)
@@ -97,16 +103,17 @@ final class DeveloperDataLookupTests: XCTestCase {
         let unaddedDeveloperDataIdMesg = DeveloperDataIdMesg()
         let unaddedFieldDescMesg = FieldDescriptionMesg()
 
-        DeveloperDataLookup.shared.addDeveloperDataIdMesg(mesg: developerDataIdMesg)
-        DeveloperDataLookup.shared.addFieldDescriptionMesg(mesg: fieldDescMesg)
+        developerDataLookup.addDeveloperDataIdMesg(mesg: developerDataIdMesg)
+        developerDataLookup.addFieldDescriptionMesg(mesg: fieldDescMesg)
         
-        var retrieved = DeveloperDataLookup.shared.getDeveloperFieldDefinition(developerDataIdMesg: unaddedDeveloperDataIdMesg, fieldDescriptionMesg: fieldDescMesg)
-        XCTAssertNil(retrieved)
-        
-        retrieved = DeveloperDataLookup.shared.getDeveloperFieldDefinition(developerDataIdMesg: developerDataIdMesg, fieldDescriptionMesg: unaddedFieldDescMesg)
-        XCTAssertNil(retrieved)
+        var retrieved = developerDataLookup.getDeveloperFieldDefinition(developerDataIdMesg: unaddedDeveloperDataIdMesg, fieldDescriptionMesg: fieldDescMesg)
+        #expect(retrieved == nil)
+
+        retrieved = developerDataLookup.getDeveloperFieldDefinition(developerDataIdMesg: developerDataIdMesg, fieldDescriptionMesg: unaddedFieldDescMesg)
+        #expect(retrieved == nil)
     }
-    
+
+    @Test
     func test_addingOverlappingMesgs() throws {
         let developerDataIdMesgOriginal = DeveloperDataIdMesg()
         try developerDataIdMesgOriginal.setDeveloperDataIndex(0)
@@ -124,23 +131,23 @@ final class DeveloperDataLookupTests: XCTestCase {
         try fieldDescMesgNew.setFieldDefinitionNumber(0)
         try fieldDescMesgNew.setFieldName(index: 0, value: "new")
 
-        DeveloperDataLookup.shared.addDeveloperDataIdMesg(mesg: developerDataIdMesgOriginal)
-        DeveloperDataLookup.shared.addFieldDescriptionMesg(mesg: fieldDescMesgOriginal)
+        developerDataLookup.addDeveloperDataIdMesg(mesg: developerDataIdMesgOriginal)
+        developerDataLookup.addFieldDescriptionMesg(mesg: fieldDescMesgOriginal)
         
-        var retrieved = DeveloperDataLookup.shared.getDeveloperFieldDefinition(developerDataIdMesg: developerDataIdMesgOriginal, fieldDescriptionMesg: fieldDescMesgOriginal)
-        XCTAssertNotNil(retrieved?.developerDataIdMesg)
-        XCTAssertNotNil(retrieved?.fieldDescriptionMesg)
-        XCTAssertEqual(retrieved?.fieldDescriptionMesg?.getFieldName(), ["original"])
-        
+        var retrieved = developerDataLookup.getDeveloperFieldDefinition(developerDataIdMesg: developerDataIdMesgOriginal, fieldDescriptionMesg: fieldDescMesgOriginal)
+        #expect(retrieved?.developerDataIdMesg != nil)
+        #expect(retrieved?.fieldDescriptionMesg != nil)
+        #expect(retrieved?.fieldDescriptionMesg?.getFieldName() == ["original"])
+
         // Add a new field description with field definition number of 0, the original should be overwritten
-        DeveloperDataLookup.shared.addFieldDescriptionMesg(mesg: fieldDescMesgNew)
-        retrieved = DeveloperDataLookup.shared.getDeveloperFieldDefinition(developerDataIdMesg: developerDataIdMesgOriginal, fieldDescriptionMesg: fieldDescMesgOriginal)
-        XCTAssertEqual(retrieved?.fieldDescriptionMesg?.getFieldName(), ["new"])
-        
+        developerDataLookup.addFieldDescriptionMesg(mesg: fieldDescMesgNew)
+        retrieved = developerDataLookup.getDeveloperFieldDefinition(developerDataIdMesg: developerDataIdMesgOriginal, fieldDescriptionMesg: fieldDescMesgOriginal)
+        #expect(retrieved?.fieldDescriptionMesg?.getFieldName() == ["new"])
+
         // Add a new DeveloperDataIdMesg with an existing developerDataIndex, it should erase all connected FieldDescriptionMesgs
-        DeveloperDataLookup.shared.addDeveloperDataIdMesg(mesg: developerDataIdMesgNew)
+        developerDataLookup.addDeveloperDataIdMesg(mesg: developerDataIdMesgNew)
         
-        retrieved = DeveloperDataLookup.shared.getDeveloperFieldDefinition(developerDataIdMesg: developerDataIdMesgOriginal, fieldDescriptionMesg: fieldDescMesgOriginal)
-        XCTAssertNil(retrieved)
+        retrieved = developerDataLookup.getDeveloperFieldDefinition(developerDataIdMesg: developerDataIdMesgOriginal, fieldDescriptionMesg: fieldDescMesgOriginal)
+        #expect(retrieved == nil)
     }
 }
