@@ -6,15 +6,18 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 
-import XCTest
+import Foundation
+import Testing
 @testable import FITSwiftSDK
 
-let packageRootPath = URL(fileURLWithPath: #file).pathComponents
+let packageRootPath = URL(fileURLWithPath: #filePath).pathComponents
     .prefix(while: { $0 != "Tests" }).joined(separator: "/").dropFirst()
 let testDataPath = packageRootPath + "/Tests/FITSwiftSDKTests/TestData"
 
-final class EncodeDecodeIntegrationTests: XCTestCase {
-    
+@Suite
+struct EncodeDecodeIntegrationTests {
+
+    @Test
     func test_whenEncodingAndThenDecodingFileWithDeveloperData_noErrorsThrownAndDecoderResultsExpected() throws {
         let encoder = Encoder();
         
@@ -43,7 +46,7 @@ final class EncodeDecodeIntegrationTests: XCTestCase {
         
         let fileURL = URL(string: "testDeveloperData.fit" , relativeTo: URL(fileURLWithPath: String(testDataPath)))
         try encodedData.write(to: fileURL!)
-        
+
         
         let stream = FITSwiftSDK.InputStream(data: encodedData)
         
@@ -55,22 +58,22 @@ final class EncodeDecodeIntegrationTests: XCTestCase {
         try decoder.read();
         
         let decodedFileIdMesg = mesgListener.fitMessages.fileIdMesgs[0]
-        XCTAssertEqual(fileIdMesg.getType(), decodedFileIdMesg.getType())
-        
+        #expect(fileIdMesg.getType() == decodedFileIdMesg.getType())
+
         let decodedDeveloperDataIdMesg = mesgListener.fitMessages.developerDataIdMesgs[0]
-        XCTAssertEqual(developerDataIdMesg.getDeveloperDataIndex(), decodedDeveloperDataIdMesg.getDeveloperDataIndex())
-        
+        #expect(developerDataIdMesg.getDeveloperDataIndex() == decodedDeveloperDataIdMesg.getDeveloperDataIndex())
+
         let decodedFieldDescriptionMesg = mesgListener.fitMessages.fieldDescriptionMesgs[0]
-        XCTAssertEqual(fieldDescriptionMesg.getDeveloperDataIndex(), decodedFieldDescriptionMesg.getDeveloperDataIndex())
-        XCTAssertEqual(fieldDescriptionMesg.getFieldDefinitionNumber(), decodedFieldDescriptionMesg.getFieldDefinitionNumber())
-        XCTAssertEqual(fieldDescriptionMesg.getFitBaseTypeId(), decodedFieldDescriptionMesg.getFitBaseTypeId())
-        XCTAssertEqual(fieldDescriptionMesg.getFieldName(), decodedFieldDescriptionMesg.getFieldName())
-        
+        #expect(fieldDescriptionMesg.getDeveloperDataIndex() == decodedFieldDescriptionMesg.getDeveloperDataIndex())
+        #expect(fieldDescriptionMesg.getFieldDefinitionNumber() == decodedFieldDescriptionMesg.getFieldDefinitionNumber())
+        #expect(fieldDescriptionMesg.getFitBaseTypeId() == decodedFieldDescriptionMesg.getFitBaseTypeId())
+        #expect(fieldDescriptionMesg.getFieldName() == decodedFieldDescriptionMesg.getFieldName())
+
         let decodedRecordMesg = mesgListener.fitMessages.recordMesgs[0]
-        XCTAssertEqual(recordMesg.getHeartRate(), decodedRecordMesg.getHeartRate())
-        
+        #expect(recordMesg.getHeartRate() == decodedRecordMesg.getHeartRate())
+
         let decodedDeveloperFieldDefinition = DeveloperFieldDefinition(fieldDescriptionMesg: decodedFieldDescriptionMesg, developerDataIdMesg: decodedDeveloperDataIdMesg, size: 0)
         let decodedDeveloperField = recordMesg.getDeveloperField(developerDataIdMesg: decodedDeveloperFieldDefinition.developerDataIdMesg!, fieldDescriptionMesg: decodedDeveloperFieldDefinition.fieldDescriptionMesg!)
-        XCTAssertEqual(developerField.getValue() as! UInt8, decodedDeveloperField?.getValue() as! UInt8 )
+        #expect(developerField.getValue() as! UInt8 == decodedDeveloperField?.getValue() as! UInt8 )
     }
 }

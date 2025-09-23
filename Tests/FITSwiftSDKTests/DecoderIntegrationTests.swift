@@ -26,6 +26,22 @@ final class DecoderIntegrationTests: XCTestCase {
         XCTAssertEqual(mesgListener.fileIdMesgs.count, 1)
     }
 
+    func test_fileContainsUnknownMessages_onMesgShouldNotThrow() throws {
+        let stream = FITSwiftSDK.InputStream(data: fitFileShortUnknownMesg)
+        let decoder = Decoder(stream: stream)
+
+        let mesgBroadcaster = MesgBroadcaster()
+        let mesgListener = TestMesgListener()
+        mesgBroadcaster.addListener(mesgListener as MesgListener)
+
+        decoder.addMesgListener(mesgBroadcaster)
+        try decoder.read()
+
+        XCTAssertEqual(mesgListener.mesgs.count, 2)
+        XCTAssertEqual(mesgListener.mesgs[0].mesgNum, MesgNum.fileId.rawValue)
+        XCTAssertEqual(mesgListener.mesgs[1].mesgNum, 1234)
+    }
+
     func test_whenBroadcastersWithThrowableListenersAreAddedToDecoder_listenerErrorsShouldBeRethrown() throws {
         let stream = FITSwiftSDK.InputStream(data: fitFileShort)
         let decoder = Decoder(stream: stream)

@@ -33,7 +33,7 @@ class ShortCircuitMesgListener: FileIdMesgListener {
     }
 }
 
-enum TestShortCircuitError: Error {
+enum TestShortCircuitError: Error, @unchecked Sendable {
     case fileIdMesgFound(FileIdMesg)
 }
 
@@ -159,67 +159,7 @@ final class DecoderTests: XCTestCase {
         
         try decoder.read();
     }
-    
-    @available(iOS 16.0, macOS 13.0, *)
-    func test_read_whenFileFromDisk_succeeds() throws {
-        try XCTSkipIf(true, "Where should the test files go?")
-        
-        let fileURL = URL(string: "third.fit" , relativeTo: URL.downloadsDirectory)
-        let fileData = try Data(contentsOf: fileURL!)
-    
-        let stream = FITSwiftSDK.InputStream(data: fileData)
-        let decoder = Decoder(stream: stream)
-        
-        XCTAssertEqual(try decoder.checkIntegrity(), true)
-        
-        let mesgListener = TestMesgListener()
-        decoder.addMesgListener(mesgListener)
-                
-        try decoder.read();
-        
-        XCTAssertGreaterThan(mesgListener.mesgs.count, 0)
-    }
-    
-    @available(iOS 16.0, macOS 13.0, *)
-    func test_read_withEdge1030TestFileFromDisk_succeeds() throws {
-        try XCTSkipIf(true, "Where should the test files go?")
-        
-        let fileURL = URL(string: "Test FIT Files/2022-05-28-09-47-18_Edge1030Plus.fit" , relativeTo: URL.downloadsDirectory)
-        let fileData = try Data(contentsOf: fileURL!)
-    
-        let stream = FITSwiftSDK.InputStream(data: fileData)
-        let decoder = Decoder(stream: stream)
-        
-        XCTAssertEqual(try decoder.checkIntegrity(), true)
-        
-        let mesgListener = TestMesgListener()
-        decoder.addMesgListener(mesgListener)
-                
-        try decoder.read();
-        
-        XCTAssertGreaterThan(mesgListener.mesgs.count, 0)
-    }
-    
-    @available(iOS 16.0, macOS 13.0, *)
-    func test_read_withForerunner955TestFileFromDisk_succeeds() throws {
-        try XCTSkipIf(true, "Where should the test files go?")
-        
-        let fileURL = URL(string: "Test FIT Files/2022-05-28-09-47-13_FR955.fit" , relativeTo: URL.downloadsDirectory)
-        let fileData = try Data(contentsOf: fileURL!)
-    
-        let stream = FITSwiftSDK.InputStream(data: fileData)
-        let decoder = Decoder(stream: stream)
-        
-        XCTAssertEqual(try decoder.checkIntegrity(), true)
-        
-        let mesgListener = TestMesgListener()
-        decoder.addMesgListener(mesgListener)
-                
-        try decoder.read();
-        
-        XCTAssertGreaterThan(mesgListener.mesgs.count, 0)
-    }
-    
+
     // MARK: Skip Header Tests
     func test_read_whenDecodeModeNormalAndFileHasInvalidHeader_throwsError() throws {
         let stream = FITSwiftSDK.InputStream(data: fitFileShortInvalidHeader)
